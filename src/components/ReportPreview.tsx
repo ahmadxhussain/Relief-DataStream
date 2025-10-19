@@ -2,18 +2,22 @@ import React from 'react';
 import { ReportData } from '../types';
 import { ArrowLeft, Download, FileText, BarChart3, AlertTriangle, TrendingUp, Calendar } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { getTranslation } from '../data/translations';
 
 interface ReportPreviewProps {
   reportData: ReportData | null;
+  currentLanguage: string;
   onDownload: (format: 'pdf' | 'docx') => void;
   onBackToHome: () => void;
 }
 
 const ReportPreview: React.FC<ReportPreviewProps> = ({
   reportData,
+  currentLanguage,
   onDownload,
   onBackToHome
 }) => {
+  const t = (key: string) => getTranslation(currentLanguage, key as any);
   if (!reportData) {
     return (
       <div className="card">
@@ -29,17 +33,17 @@ const ReportPreview: React.FC<ReportPreviewProps> = ({
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h1 style={{ color: '#1e293b' }}>Report Preview</h1>
+        <h1 style={{ color: '#1e293b' }}>{t('reportPreview')}</h1>
         <button className="btn btn-outline" onClick={onBackToHome}>
           <ArrowLeft size={16} />
-          Back to Home
+          {t('backToHome')}
         </button>
       </div>
 
       <div className="report-section">
         <h3>
           <FileText size={20} style={{ display: 'inline', marginRight: '0.5rem' }} />
-          Executive Summary
+          {t('executiveSummary')}
         </h3>
         <div className="report-content">
           <p>{reportData.summary}</p>
@@ -49,7 +53,7 @@ const ReportPreview: React.FC<ReportPreviewProps> = ({
       <div className="report-section">
         <h3>
           <Calendar size={20} style={{ display: 'inline', marginRight: '0.5rem' }} />
-          Key Events
+          {t('keyEvents')}
         </h3>
         <div className="report-content">
           <ul style={{ paddingLeft: '1.5rem' }}>
@@ -63,7 +67,7 @@ const ReportPreview: React.FC<ReportPreviewProps> = ({
       <div className="report-section">
         <h3>
           <TrendingUp size={20} style={{ display: 'inline', marginRight: '0.5rem' }} />
-          Trends
+          {t('trends')}
         </h3>
         <div className="report-content">
           <ul style={{ paddingLeft: '1.5rem' }}>
@@ -77,7 +81,7 @@ const ReportPreview: React.FC<ReportPreviewProps> = ({
       <div className="report-section">
         <h3>
           <AlertTriangle size={20} style={{ display: 'inline', marginRight: '0.5rem' }} />
-          Risks
+          {t('risks')}
         </h3>
         <div className="report-content">
           <ul style={{ paddingLeft: '1.5rem' }}>
@@ -91,10 +95,10 @@ const ReportPreview: React.FC<ReportPreviewProps> = ({
       <div className="report-section">
         <h3>
           <BarChart3 size={20} style={{ display: 'inline', marginRight: '0.5rem' }} />
-          Data Visualization
+          {t('dataVisualization')}
         </h3>
         <div className="chart-container">
-          <h4 style={{ marginBottom: '1rem', color: '#374151' }}>Monthly Trends</h4>
+          <h4 style={{ marginBottom: '1rem', color: '#374151' }}>{t('monthlyTrends')}</h4>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={reportData.chartData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -107,7 +111,7 @@ const ReportPreview: React.FC<ReportPreviewProps> = ({
         </div>
 
         <div className="chart-container">
-          <h4 style={{ marginBottom: '1rem', color: '#374151' }}>Monthly Comparison</h4>
+          <h4 style={{ marginBottom: '1rem', color: '#374151' }}>{t('monthlyComparison')}</h4>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={reportData.chartData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -121,9 +125,9 @@ const ReportPreview: React.FC<ReportPreviewProps> = ({
       </div>
 
       <div className="card">
-        <h3 style={{ marginBottom: '1rem' }}>Download Report</h3>
+        <h3 style={{ marginBottom: '1rem' }}>{t('downloadReport')}</h3>
         <p style={{ marginBottom: '1.5rem', color: '#6b7280' }}>
-          Choose your preferred format to download the complete report.
+          {t('downloadDescription')}
         </p>
         <div className="download-buttons">
           <button
@@ -131,14 +135,14 @@ const ReportPreview: React.FC<ReportPreviewProps> = ({
             onClick={() => onDownload('pdf')}
           >
             <Download size={16} />
-            Download PDF
+            {t('downloadPDF')}
           </button>
           <button
             className="btn btn-secondary"
             onClick={() => onDownload('docx')}
           >
             <Download size={16} />
-            Download DOCX
+            {t('downloadDOCX')}
           </button>
         </div>
       </div>

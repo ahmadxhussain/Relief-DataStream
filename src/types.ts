@@ -43,4 +43,15 @@ export interface AppState {
   currentStep: number;
   error: ErrorState;
   isLoading: boolean;
+  currentLanguage: string;
+  savedReports: SavedReport[];
+}
+
+export interface SavedReport {
+  id: string;
+  country: Country;
+  dateRange: { startDate: string; endDate: string };
+  reportData: ReportData;
+  createdAt: string;
+  title: string;
 }

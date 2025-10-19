@@ -1,6 +1,7 @@
 import React from 'react';
 import { Country, DateRange, ProgressStep } from '../types';
 import { Calendar, MapPin, Play, RotateCcw } from 'lucide-react';
+import { getTranslation } from '../data/translations';
 
 interface HomeScreenProps {
   countries: Country[];
@@ -9,6 +10,7 @@ interface HomeScreenProps {
   progressSteps: ProgressStep[];
   currentStep: number;
   isLoading: boolean;
+  currentLanguage: string;
   onCountryChange: (country: Country | null) => void;
   onDateRangeChange: (dateRange: DateRange | null) => void;
   onBuildReport: () => void;
@@ -22,11 +24,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   progressSteps,
   currentStep,
   isLoading,
+  currentLanguage,
   onCountryChange,
   onDateRangeChange,
   onBuildReport,
   onReset
 }) => {
+  const t = (key: string) => getTranslation(currentLanguage, key as any);
   const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const countryCode = e.target.value;
     const country = countryCode ? countries.find(c => c.code === countryCode) || null : null;
@@ -55,16 +59,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     <div>
       <div className="card">
         <h1 style={{ marginBottom: '1.5rem', color: '#1e293b' }}>
-          Generate NGO Report
+          {t('generateReport')}
         </h1>
         <p style={{ marginBottom: '2rem', color: '#6b7280' }}>
-          Select a country and date range to generate a comprehensive humanitarian and development report.
+          {t('step1Description')}
         </p>
 
         <div className="form-group">
           <label className="form-label">
             <MapPin size={16} style={{ display: 'inline', marginRight: '0.5rem' }} />
-            Country
+            {t('selectCountry')}
           </label>
           <select
             className="form-select"
@@ -72,7 +76,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
             onChange={handleCountryChange}
             disabled={isLoading}
           >
-            <option value="">Select a country...</option>
+            <option value="">{t('selectCountryPlaceholder')}</option>
             {countries.map(country => (
               <option key={country.code} value={country.code}>
                 {country.name}
@@ -85,7 +89,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
           <div className="form-group">
             <label className="form-label">
               <Calendar size={16} style={{ display: 'inline', marginRight: '0.5rem' }} />
-              Start Date
+              {t('startDate')}
             </label>
             <input
               type="date"
@@ -99,7 +103,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
           <div className="form-group">
             <label className="form-label">
               <Calendar size={16} style={{ display: 'inline', marginRight: '0.5rem' }} />
-              End Date
+              {t('endDate')}
             </label>
             <input
               type="date"
@@ -118,7 +122,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
             disabled={!canBuild}
           >
             <Play size={16} />
-            {isLoading ? 'Building...' : 'Build Report'}
+            {isLoading ? t('building') : t('buildReport')}
           </button>
           
           <button
@@ -127,14 +131,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
             disabled={isLoading}
           >
             <RotateCcw size={16} />
-            Reset
+            {t('reset')}
           </button>
         </div>
       </div>
 
       {isLoading && (
         <div className="card">
-          <h3 style={{ marginBottom: '1rem' }}>Building Report</h3>
+          <h3 style={{ marginBottom: '1rem' }}>{t('building')} {t('report')}</h3>
           <div className="progress-bar">
             <div 
               className="progress-fill" 
@@ -150,7 +154,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
                 <div className="step-circle">
                   {step.completed ? '✓' : index + 1}
                 </div>
-                <div className="step-label">{step.label}</div>
+                <div className="step-label">{t(step.id)}</div>
               </div>
             ))}
           </div>

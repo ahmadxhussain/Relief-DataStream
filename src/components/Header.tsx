@@ -1,12 +1,16 @@
 import React from 'react';
 import { AppState } from '../types';
+import { getTranslation } from '../data/translations';
 
 interface HeaderProps {
   currentScreen: AppState['currentScreen'];
+  currentLanguage: string;
   onNavigate: (screen: AppState['currentScreen']) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate }) => {
+const Header: React.FC<HeaderProps> = ({ currentScreen, currentLanguage, onNavigate }) => {
+  const t = (key: string) => getTranslation(currentLanguage, key as any);
+  
   return (
     <header className="header">
       <div className="container">
@@ -20,14 +24,28 @@ const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate }) => {
               onClick={() => onNavigate('home')}
               style={{ background: 'none', border: 'none', cursor: 'pointer' }}
             >
-              Home
+              {t('home')}
+            </button>
+            <button
+              className={`nav-link ${currentScreen === 'history' ? 'active' : ''}`}
+              onClick={() => onNavigate('history')}
+              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              {t('history')}
+            </button>
+            <button
+              className={`nav-link ${currentScreen === 'settings' ? 'active' : ''}`}
+              onClick={() => onNavigate('settings')}
+              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              {t('settings')}
             </button>
             <button
               className={`nav-link ${currentScreen === 'help' ? 'active' : ''}`}
               onClick={() => onNavigate('help')}
               style={{ background: 'none', border: 'none', cursor: 'pointer' }}
             >
-              Help
+              {t('help')}
             </button>
           </nav>
         </div>

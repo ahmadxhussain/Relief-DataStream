@@ -1,10 +1,13 @@
-import React, { useState, useCallback } from 'react';
-import { AppState, Country, DateRange, ReportData, ProgressStep, ErrorState } from './types';
+import React, { useState, useCallback, useEffect } from 'react';
+import { AppState, Country, DateRange, ProgressStep, SavedReport } from './types';
 import { countries, generateMockReportData } from './data/mockData';
+import { getTranslation } from './data/translations';
 import Header from './components/Header';
 import HomeScreen from './components/HomeScreen';
 import ReportPreview from './components/ReportPreview';
 import HelpScreen from './components/HelpScreen';
+import SettingsScreen from './components/SettingsScreen';
+import HistoryScreen from './components/HistoryScreen';
 import ErrorBanner from './components/ErrorBanner';
 
 const initialProgressSteps: ProgressStep[] = [
@@ -24,7 +27,21 @@ const App: React.FC = () => {
     currentStep: 0,
     error: { message: '', show: false },
     isLoading: false,
+    currentLanguage: 'en',
+    savedReports: [],
   });
+
+  // Load saved settings and reports on app start
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('ngo-app-language') || 'en';
+    const savedReports = localStorage.getItem('ngo-reports-history');
+    
+    setState(prev => ({
+      ...prev,
+      currentLanguage: savedLanguage,
+      savedReports: savedReports ? JSON.parse(savedReports) : []
+    }));
+  }, []);
 
   const showError = useCallback((message: string) => {
     setState(prev => ({
@@ -46,6 +63,14 @@ const App: React.FC = () => {
       currentScreen: screen,
       error: { message: '', show: false }
     }));
+  }, []);
+
+  const setLanguage = useCallback((language: string) => {
+    setState(prev => ({
+      ...prev,
+      currentLanguage: language
+    }));
+    localStorage.setItem('ngo-app-language', language);
   }, []);
 
   const setCountry = useCallback((country: Country | null) => {
@@ -112,9 +137,23 @@ const App: React.FC = () => {
       // Generate mock report data
       const reportData = generateMockReportData(state.selectedCountry, state.dateRange);
       
+      // Save report to history
+      const newReport: SavedReport = {
+        id: Date.now().toString(),
+        country: state.selectedCountry!,
+        dateRange: state.dateRange!,
+        reportData,
+        createdAt: new Date().toISOString(),
+        title: `${state.selectedCountry!.name} Report - ${state.dateRange!.startDate} to ${state.dateRange!.endDate}`
+      };
+      
+      const updatedReports = [...state.savedReports, newReport];
+      localStorage.setItem('ngo-reports-history', JSON.stringify(updatedReports));
+      
       setState(prev => ({
         ...prev,
         reportData,
+        savedReports: updatedReports,
         isLoading: false,
         currentScreen: 'preview'
       }));
@@ -134,13 +173,26 @@ const App: React.FC = () => {
     try {
       // Mock download - in real app, this would call the backend
       await new Promise(resolve => setTimeout(resolve, 1000));
-      alert(`Downloading ${format.toUpperCase()} report... (This is a mock download)`);
+      const t = (key: string) => getTranslation(state.currentLanguage, key as any);
+      alert(`${t('downloading')} ${format.toUpperCase()} ${t('report')}... (${t('mockDownload')})`);
     } catch (error) {
-      showError('Download failed. Please try again.');
+      const t = (key: string) => getTranslation(state.currentLanguage, key as any);
+      showError(t('errorDownload'));
     }
-  }, [showError]);
+  }, [showError, state.currentLanguage]);
+
+  const openReport = useCallback((report: SavedReport) => {
+    setState(prev => ({
+      ...prev,
+      reportData: report.reportData,
+      selectedCountry: report.country,
+      dateRange: report.dateRange,
+      currentScreen: 'preview'
+    }));
+  }, []);
 
   const renderCurrentScreen = () => {
+    
     switch (state.currentScreen) {
       case 'home':
         return (
@@ -151,6 +203,7 @@ const App: React.FC = () => {
             progressSteps={state.progressSteps}
             currentStep={state.currentStep}
             isLoading={state.isLoading}
+            currentLanguage={state.currentLanguage}
             onCountryChange={setCountry}
             onDateRangeChange={setDateRange}
             onBuildReport={buildReport}
@@ -161,6 +214,7 @@ const App: React.FC = () => {
         return (
           <ReportPreview
             reportData={state.reportData}
+            currentLanguage={state.currentLanguage}
             onDownload={downloadReport}
             onBackToHome={() => setScreen('home')}
           />
@@ -168,6 +222,22 @@ const App: React.FC = () => {
       case 'help':
         return (
           <HelpScreen
+            onBackToHome={() => setScreen('home')}
+          />
+        );
+      case 'settings':
+        return (
+          <SettingsScreen
+            currentLanguage={state.currentLanguage}
+            onLanguageChange={setLanguage}
+            onBackToHome={() => setScreen('home')}
+          />
+        );
+      case 'history':
+        return (
+          <HistoryScreen
+            currentLanguage={state.currentLanguage}
+            onOpenReport={openReport}
             onBackToHome={() => setScreen('home')}
           />
         );
@@ -180,6 +250,7 @@ const App: React.FC = () => {
     <div className="App">
       <Header
         currentScreen={state.currentScreen}
+        currentLanguage={state.currentLanguage}
         onNavigate={setScreen}
       />
       <div className="container">
