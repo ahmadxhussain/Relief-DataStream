@@ -24,18 +24,26 @@ A Streamlit-based front-end application for NGO data helpers to generate compreh
 
 ### Installation
 
-1. Clone the repository
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ahmadxhussain/Relief-DataStream.git
+   cd Relief-DataStream
+   ```
+
 2. Install dependencies:
    ```bash
-   pip install -r requirements.txt
+   python -m pip install -r requirements.txt
    ```
 
 3. Run the Streamlit application:
    ```bash
-   streamlit run app.py
+   python -m streamlit run app.py
    ```
 
 4. Open your browser and navigate to `http://localhost:8501`
+
+### Windows PowerShell Note
+If you get `CommandNotFoundException` errors, use the `python -m` approach shown above, which bypasses PATH issues on Windows.
 
 ## Usage
 
@@ -56,6 +64,8 @@ A Streamlit-based front-end application for NGO data helpers to generate compreh
 - **NumPy** - Numerical computing
 - **Requests** - HTTP API communication
 - **Python-dotenv** - Environment configuration
+- **ReportLab** - PDF generation
+- **Python-docx** - DOCX generation
 
 ## Project Structure
 
