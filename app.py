@@ -155,8 +155,87 @@ def reset_form():
     ]
     clear_error()
 
+# def build_report():
+#     """Simulate report building process"""
+#     if not st.session_state.selected_country or not st.session_state.date_range:
+#         show_error(get_translation(st.session_state.current_language, 'error_country_dates'))
+#         return
+    
+#     st.session_state.is_loading = True
+#     st.session_state.current_step = 0
+    
+#     # Simulate progress steps
+#     progress_bar = st.progress(0)
+#     status_text = st.empty()
+    
+#     steps = ['step_collecting', 'step_processing', 'step_summarizing', 'step_ready']
+    
+#     for i, step in enumerate(steps):
+#         status_text.text(f"Status: {get_translation(st.session_state.current_language, step)}")
+#         progress_bar.progress((i + 1) / len(steps))
+        
+#         # Update progress steps
+#         for j, progress_step in enumerate(st.session_state.progress_steps):
+#             progress_step['completed'] = j <= i
+#             progress_step['active'] = j == i + 1
+        
+#         st.session_state.current_step = i + 1
+        
+#         # Simulate processing time
+#         import time
+#         time.sleep(1)
+    
+#     # Get report data from API service
+#     try:
+#         report_response = api_service.generate_report(
+#             st.session_state.selected_country,
+#             st.session_state.date_range
+#         )
+        
+#         if 'error' in report_response:
+#             show_error(report_response['error'])
+#             st.session_state.is_loading = False
+#             return
+        
+#         report_id = report_response['report_id']
+#         report_data = api_service.get_report_data(report_id)
+        
+#         if report_data and 'error' not in report_data:
+#             st.session_state.report_data = report_data
+#         else:
+#             # Fallback to mock data
+#             st.session_state.report_data = generate_mock_report_data(
+#                 st.session_state.selected_country,
+#                 st.session_state.date_range
+#             )
+    
+#     except Exception as e:
+#         # Fallback to mock data on error
+#         st.session_state.report_data = generate_mock_report_data(
+#             st.session_state.selected_country,
+#             st.session_state.date_range
+#         )
+    
+#     # Save to history
+#     report_id = str(datetime.now().timestamp())
+#     saved_report = {
+#         'id': report_id,
+#         'country': st.session_state.selected_country,
+#         'date_range': st.session_state.date_range,
+#         'report_data': st.session_state.report_data,
+#         'created_at': datetime.now().isoformat(),
+#         'title': f"{st.session_state.selected_country['name']} Report - {st.session_state.date_range['start_date']} to {st.session_state.date_range['end_date']}"
+#     }
+    
+#     st.session_state.saved_reports.append(saved_report)
+    
+#     st.session_state.is_loading = False
+#     st.session_state.current_page = 'preview'
+    
+#     progress_bar.empty()
+#     status_text.empty()
 def build_report():
-    """Simulate report building process"""
+    """Build report using actual Llama model"""
     if not st.session_state.selected_country or not st.session_state.date_range:
         show_error(get_translation(st.session_state.current_language, 'error_country_dates'))
         return
@@ -164,7 +243,7 @@ def build_report():
     st.session_state.is_loading = True
     st.session_state.current_step = 0
     
-    # Simulate progress steps
+    # Progress bar
     progress_bar = st.progress(0)
     status_text = st.empty()
     
@@ -181,40 +260,28 @@ def build_report():
         
         st.session_state.current_step = i + 1
         
-        # Simulate processing time
+        # Simulate processing time (or remove if you want real-time)
         import time
         time.sleep(1)
     
-    # Get report data from API service
+    # Get REAL report data from Llama service
     try:
-        report_response = api_service.generate_report(
-            st.session_state.selected_country,
+        report_data = llama_service.generate_report(
+            st.session_state.selected_country['name'],
             st.session_state.date_range
         )
         
-        if 'error' in report_response:
-            show_error(report_response['error'])
+        if 'error' in report_data:
+            show_error(report_data['error'])
             st.session_state.is_loading = False
             return
         
-        report_id = report_response['report_id']
-        report_data = api_service.get_report_data(report_id)
-        
-        if report_data and 'error' not in report_data:
-            st.session_state.report_data = report_data
-        else:
-            # Fallback to mock data
-            st.session_state.report_data = generate_mock_report_data(
-                st.session_state.selected_country,
-                st.session_state.date_range
-            )
+        st.session_state.report_data = report_data
     
     except Exception as e:
-        # Fallback to mock data on error
-        st.session_state.report_data = generate_mock_report_data(
-            st.session_state.selected_country,
-            st.session_state.date_range
-        )
+        show_error(f"Failed to generate report: {str(e)}")
+        st.session_state.is_loading = False
+        return
     
     # Save to history
     report_id = str(datetime.now().timestamp())

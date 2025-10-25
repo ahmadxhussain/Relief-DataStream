@@ -54,27 +54,28 @@ class APIService:
         Returns:
             Dict containing report_id and initial status
         """
-        if self.use_mock:
-            return self._generate_mock_report(country, date_range)
+        # if self.use_mock:
+        #     return self._generate_mock_report(country, date_range)
         
-        try:
-            payload = {
-                "country": country,
-                "date_range": date_range,
-                "language": "en"  # Will be updated to use current language
-            }
+        # try:
+        #     payload = {
+        #         "country": country,
+        #         "date_range": date_range,
+        #         "language": "en"  # Will be updated to use current language
+        #     }
             
-            response = requests.post(
-                f"{self.base_url}/api/reports",
-                json=payload,
-                timeout=self.timeout
-            )
-            response.raise_for_status()
-            return response.json()
-        except requests.exceptions.RequestException as e:
-            print(f"Error starting report generation: {e}")
-            # Fallback to mock data on error
-            return self._generate_mock_report(country, date_range)
+        #     response = requests.post(
+        #         f"{self.base_url}/api/reports",
+        #         json=payload,
+        #         timeout=self.timeout
+        #     )
+        #     response.raise_for_status()
+        #     return response.json()
+        # except requests.exceptions.RequestException as e:
+        #     print(f"Error starting report generation: {e}")
+        #     # Fallback to mock data on error
+        #     return self._generate_mock_report(country, date_range)
+        return llama_service.generate_report(country['name'], date_range)
     
     def check_report_status(self, report_id: str) -> Dict[str, Any]:
         """
